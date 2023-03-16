@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="Хранилище ProkatModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Заказы">
+    <Key>
+      <PropertyRef Name="Код" />
+    </Key>
+    <Property Name="Код" Type="int" Nullable="false" />
+    <Property Name="Код_заказа" Type="nvarchar" MaxLength="255" />
+    <Property Name="Дата_создания" Type="datetime" />
+    <Property Name="Время_заказа" Type="time" Precision="0" />
+    <Property Name="Код_клиента" Type="int" />
+    <Property Name="Статус" Type="nvarchar" MaxLength="255" />
+    <Property Name="Дата_закрытия" Type="datetime" />
+    <Property Name="Время_проката_ч" Type="float" />
+  </EntityType>
+  <EntityType Name="История посещений">
+    <Key>
+      <PropertyRef Name="Код_авторизации" />
+    </Key>
+    <Property Name="Код_авторизации" Type="int" Nullable="false" />
+    <Property Name="Код_сотрудника" Type="int" Nullable="false" />
+    <Property Name="Последний_вход" Type="nvarchar" MaxLength="255" />
+    <Property Name="Тип_входа" Type="nvarchar" MaxLength="255" />
+  </EntityType>
+  <EntityType Name="Клиенты">
+    <Key>
+      <PropertyRef Name="Код_клиента" />
+    </Key>
+    <Property Name="Код_клиента" Type="int" Nullable="false" />
+    <Property Name="Фамилия" Type="nvarchar" MaxLength="255" />
+    <Property Name="Имя" Type="nvarchar" MaxLength="255" />
+    <Property Name="Отчество" Type="nvarchar" MaxLength="255" />
+    <Property Name="Серия_паспорта" Type="int" />
+    <Property Name="Номер_паспорта" Type="int" />
+    <Property Name="Дата_рождения" Type="datetime" />
+    <Property Name="Адрес" Type="nvarchar" MaxLength="255" />
+    <Property Name="Почта" Type="nvarchar" MaxLength="255" />
+    <Property Name="Пароль" Type="nvarchar" MaxLength="255" />
+  </EntityType>
+  <EntityType Name="Пользователи">
+    <Key>
+      <PropertyRef Name="Код_сотрудника" />
+    </Key>
+    <Property Name="Код_сотрудника" Type="int" Nullable="false" />
+    <Property Name="Должность" Type="nvarchar" MaxLength="255" />
+    <Property Name="Фамилия" Type="nvarchar" MaxLength="255" />
+    <Property Name="Имя" Type="nvarchar" MaxLength="255" />
+    <Property Name="Отчество" Type="nvarchar" MaxLength="255" />
+    <Property Name="Логин" Type="nvarchar" MaxLength="255" />
+    <Property Name="Пароль" Type="nvarchar" MaxLength="255" />
+  </EntityType>
+  <EntityType Name="Услуги">
+    <Key>
+      <PropertyRef Name="Код" />
+    </Key>
+    <Property Name="Код" Type="int" Nullable="false" />
+    <Property Name="Наименование_услуги" Type="nvarchar" MaxLength="255" />
+    <Property Name="Код_услуги" Type="nvarchar" MaxLength="255" />
+    <Property Name="Стоимость_руб_за_час" Type="float" />
+  </EntityType>
+  <!--Ошибки, обнаруженные при создании:
+предупреждение 6002: В таблице или представлении "Prokat.dbo.Услуги в заказе" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
+  <EntityType Name="Услуги в заказе">
+    <Key>
+      <PropertyRef Name="Код_заказа" />
+      <PropertyRef Name="Код_услуги" />
+    </Key>
+    <Property Name="Код_заказа" Type="int" Nullable="false" />
+    <Property Name="Код_услуги" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_Заказы_Клиенты">
+    <End Role="Клиенты" Type="Self.Клиенты" Multiplicity="0..1" />
+    <End Role="Заказы" Type="Self.Заказы" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Клиенты">
+        <PropertyRef Name="Код_клиента" />
+      </Principal>
+      <Dependent Role="Заказы">
+        <PropertyRef Name="Код_клиента" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_История посещений_Пользователи">
+    <End Role="Пользователи" Type="Self.Пользователи" Multiplicity="1" />
+    <End Role="История посещений" Type="Self.История посещений" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Пользователи">
+        <PropertyRef Name="Код_сотрудника" />
+      </Principal>
+      <Dependent Role="История посещений">
+        <PropertyRef Name="Код_сотрудника" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Услуги в заказе_Заказы">
+    <End Role="Заказы" Type="Self.Заказы" Multiplicity="1" />
+    <End Role="Услуги в заказе" Type="Self.Услуги в заказе" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Заказы">
+        <PropertyRef Name="Код" />
+      </Principal>
+      <Dependent Role="Услуги в заказе">
+        <PropertyRef Name="Код_заказа" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Услуги в заказе_Услуги">
+    <End Role="Услуги" Type="Self.Услуги" Multiplicity="1" />
+    <End Role="Услуги в заказе" Type="Self.Услуги в заказе" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Услуги">
+        <PropertyRef Name="Код" />
+      </Principal>
+      <Dependent Role="Услуги в заказе">
+        <PropertyRef Name="Код_услуги" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="Хранилище ProkatModelContainer">
+    <EntitySet Name="Заказы" EntityType="Self.Заказы" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="История посещений" EntityType="Self.История посещений" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Клиенты" EntityType="Self.Клиенты" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Пользователи" EntityType="Self.Пользователи" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Услуги" EntityType="Self.Услуги" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Услуги в заказе" EntityType="Self.Услуги в заказе" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [Услуги в заказе].[Код_заказа] AS [Код_заказа], 
+    [Услуги в заказе].[Код_услуги] AS [Код_услуги]
+    FROM [dbo].[Услуги в заказе] AS [Услуги в заказе]</DefiningQuery>
+    </EntitySet>
+    <AssociationSet Name="FK_Заказы_Клиенты" Association="Self.FK_Заказы_Клиенты">
+      <End Role="Клиенты" EntitySet="Клиенты" />
+      <End Role="Заказы" EntitySet="Заказы" />
+    </AssociationSet>
+    <AssociationSet Name="FK_История посещений_Пользователи" Association="Self.FK_История посещений_Пользователи">
+      <End Role="Пользователи" EntitySet="Пользователи" />
+      <End Role="История посещений" EntitySet="История посещений" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Услуги в заказе_Заказы" Association="Self.FK_Услуги в заказе_Заказы">
+      <End Role="Заказы" EntitySet="Заказы" />
+      <End Role="Услуги в заказе" EntitySet="Услуги в заказе" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Услуги в заказе_Услуги" Association="Self.FK_Услуги в заказе_Услуги">
+      <End Role="Услуги" EntitySet="Услуги" />
+      <End Role="Услуги в заказе" EntitySet="Услуги в заказе" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

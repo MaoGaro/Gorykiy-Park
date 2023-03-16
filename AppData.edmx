@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Хранилище ProkatModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Заказы">
+          <Key>
+            <PropertyRef Name="Код" />
+          </Key>
+          <Property Name="Код" Type="int" Nullable="false" />
+          <Property Name="Код_заказа" Type="nvarchar" MaxLength="255" />
+          <Property Name="Дата_создания" Type="datetime" />
+          <Property Name="Время_заказа" Type="time" Precision="0" />
+          <Property Name="Код_клиента" Type="int" />
+          <Property Name="Статус" Type="nvarchar" MaxLength="255" />
+          <Property Name="Дата_закрытия" Type="datetime" />
+          <Property Name="Время_проката_ч" Type="float" />
+        </EntityType>
+        <EntityType Name="История посещений">
+          <Key>
+            <PropertyRef Name="Код_авторизации" />
+          </Key>
+          <Property Name="Код_авторизации" Type="int" Nullable="false" />
+          <Property Name="Код_сотрудника" Type="int" Nullable="false" />
+          <Property Name="Последний_вход" Type="nvarchar" MaxLength="255" />
+          <Property Name="Тип_входа" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Клиенты">
+          <Key>
+            <PropertyRef Name="Код_клиента" />
+          </Key>
+          <Property Name="Код_клиента" Type="int" Nullable="false" />
+          <Property Name="Фамилия" Type="nvarchar" MaxLength="255" />
+          <Property Name="Имя" Type="nvarchar" MaxLength="255" />
+          <Property Name="Отчество" Type="nvarchar" MaxLength="255" />
+          <Property Name="Серия_паспорта" Type="int" />
+          <Property Name="Номер_паспорта" Type="int" />
+          <Property Name="Дата_рождения" Type="datetime" />
+          <Property Name="Адрес" Type="nvarchar" MaxLength="255" />
+          <Property Name="Почта" Type="nvarchar" MaxLength="255" />
+          <Property Name="Пароль" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Пользователи">
+          <Key>
+            <PropertyRef Name="Код_сотрудника" />
+          </Key>
+          <Property Name="Код_сотрудника" Type="int" Nullable="false" />
+          <Property Name="Должность" Type="nvarchar" MaxLength="255" />
+          <Property Name="Фамилия" Type="nvarchar" MaxLength="255" />
+          <Property Name="Имя" Type="nvarchar" MaxLength="255" />
+          <Property Name="Отчество" Type="nvarchar" MaxLength="255" />
+          <Property Name="Логин" Type="nvarchar" MaxLength="255" />
+          <Property Name="Пароль" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="Услуги">
+          <Key>
+            <PropertyRef Name="Код" />
+          </Key>
+          <Property Name="Код" Type="int" Nullable="false" />
+          <Property Name="Наименование_услуги" Type="nvarchar" MaxLength="255" />
+          <Property Name="Код_услуги" Type="nvarchar" MaxLength="255" />
+          <Property Name="Стоимость_руб_за_час" Type="float" />
+        </EntityType>
+        <!--Ошибки, обнаруженные при создании:
+предупреждение 6002: В таблице или представлении "Prokat.dbo.Услуги в заказе" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
+        <EntityType Name="Услуги в заказе">
+          <Key>
+            <PropertyRef Name="Код_заказа" />
+            <PropertyRef Name="Код_услуги" />
+          </Key>
+          <Property Name="Код_заказа" Type="int" Nullable="false" />
+          <Property Name="Код_услуги" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Заказы_Клиенты">
+          <End Role="Клиенты" Type="Self.Клиенты" Multiplicity="0..1" />
+          <End Role="Заказы" Type="Self.Заказы" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Клиенты">
+              <PropertyRef Name="Код_клиента" />
+            </Principal>
+            <Dependent Role="Заказы">
+              <PropertyRef Name="Код_клиента" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_История посещений_Пользователи">
+          <End Role="Пользователи" Type="Self.Пользователи" Multiplicity="1" />
+          <End Role="История посещений" Type="Self.История посещений" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Пользователи">
+              <PropertyRef Name="Код_сотрудника" />
+            </Principal>
+            <Dependent Role="История посещений">
+              <PropertyRef Name="Код_сотрудника" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Услуги в заказе_Заказы">
+          <End Role="Заказы" Type="Self.Заказы" Multiplicity="1" />
+          <End Role="Услуги в заказе" Type="Self.Услуги в заказе" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Заказы">
+              <PropertyRef Name="Код" />
+            </Principal>
+            <Dependent Role="Услуги в заказе">
+              <PropertyRef Name="Код_заказа" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Услуги в заказе_Услуги">
+          <End Role="Услуги" Type="Self.Услуги" Multiplicity="1" />
+          <End Role="Услуги в заказе" Type="Self.Услуги в заказе" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Услуги">
+              <PropertyRef Name="Код" />
+            </Principal>
+            <Dependent Role="Услуги в заказе">
+              <PropertyRef Name="Код_услуги" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище ProkatModelContainer">
+          <EntitySet Name="Заказы" EntityType="Self.Заказы" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="История посещений" EntityType="Self.История посещений" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Клиенты" EntityType="Self.Клиенты" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Пользователи" EntityType="Self.Пользователи" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Услуги" EntityType="Self.Услуги" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Услуги в заказе" EntityType="Self.Услуги в заказе" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Услуги в заказе].[Код_заказа] AS [Код_заказа], 
+    [Услуги в заказе].[Код_услуги] AS [Код_услуги]
+    FROM [dbo].[Услуги в заказе] AS [Услуги в заказе]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Заказы_Клиенты" Association="Self.FK_Заказы_Клиенты">
+            <End Role="Клиенты" EntitySet="Клиенты" />
+            <End Role="Заказы" EntitySet="Заказы" />
+          </AssociationSet>
+          <AssociationSet Name="FK_История посещений_Пользователи" Association="Self.FK_История посещений_Пользователи">
+            <End Role="Пользователи" EntitySet="Пользователи" />
+            <End Role="История посещений" EntitySet="История посещений" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Услуги в заказе_Заказы" Association="Self.FK_Услуги в заказе_Заказы">
+            <End Role="Заказы" EntitySet="Заказы" />
+            <End Role="Услуги в заказе" EntitySet="Услуги в заказе" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Услуги в заказе_Услуги" Association="Self.FK_Услуги в заказе_Услуги">
+            <End Role="Услуги" EntitySet="Услуги" />
+            <End Role="Услуги в заказе" EntitySet="Услуги в заказе" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ProkatModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Заказы">
+          <Key>
+            <PropertyRef Name="Код" />
+          </Key>
+          <Property Name="Код" Type="Int32" Nullable="false" />
+          <Property Name="Код_заказа" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Дата_создания" Type="DateTime" Precision="3" />
+          <Property Name="Время_заказа" Type="Time" Precision="0" />
+          <Property Name="Код_клиента" Type="Int32" />
+          <Property Name="Статус" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Дата_закрытия" Type="DateTime" Precision="3" />
+          <Property Name="Время_проката_ч" Type="Double" />
+          <NavigationProperty Name="Клиенты" Relationship="Self.FK_Заказы_Клиенты" FromRole="Заказы" ToRole="Клиенты" />
+          <NavigationProperty Name="Услуги" Relationship="Self.Услуги_в_заказе" FromRole="Заказы" ToRole="Услуги" />
+        </EntityType>
+        <EntityType Name="История_посещений">
+          <Key>
+            <PropertyRef Name="Код_авторизации" />
+          </Key>
+          <Property Name="Код_авторизации" Type="Int32" Nullable="false" />
+          <Property Name="Код_сотрудника" Type="Int32" Nullable="false" />
+          <Property Name="Последний_вход" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Тип_входа" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Пользователи" Relationship="Self.FK_История_посещений_Пользователи" FromRole="История_посещений" ToRole="Пользователи" />
+        </EntityType>
+        <EntityType Name="Клиенты">
+          <Key>
+            <PropertyRef Name="Код_клиента" />
+          </Key>
+          <Property Name="Код_клиента" Type="Int32" Nullable="false" />
+          <Property Name="Фамилия" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Имя" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Отчество" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Серия_паспорта" Type="Int32" />
+          <Property Name="Номер_паспорта" Type="Int32" />
+          <Property Name="Дата_рождения" Type="DateTime" Precision="3" />
+          <Property Name="Адрес" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Почта" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Пароль" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Заказы" Relationship="Self.FK_Заказы_Клиенты" FromRole="Клиенты" ToRole="Заказы" />
+        </EntityType>
+        <EntityType Name="Пользователи">
+          <Key>
+            <PropertyRef Name="Код_сотрудника" />
+          </Key>
+          <Property Name="Код_сотрудника" Type="Int32" Nullable="false" />
+          <Property Name="Должность" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Фамилия" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Имя" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Отчество" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Логин" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Пароль" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="История_посещений" Relationship="Self.FK_История_посещений_Пользователи" FromRole="Пользователи" ToRole="История_посещений" />
+        </EntityType>
+        <EntityType Name="Услуги">
+          <Key>
+            <PropertyRef Name="Код" />
+          </Key>
+          <Property Name="Код" Type="Int32" Nullable="false" />
+          <Property Name="Наименование_услуги" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Код_услуги" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Стоимость_руб_за_час" Type="Double" />
+          <NavigationProperty Name="Заказы" Relationship="Self.Услуги_в_заказе" FromRole="Услуги" ToRole="Заказы" />
+        </EntityType>
+        <Association Name="FK_Заказы_Клиенты">
+          <End Role="Клиенты" Type="Self.Клиенты" Multiplicity="0..1" />
+          <End Role="Заказы" Type="Self.Заказы" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Клиенты">
+              <PropertyRef Name="Код_клиента" />
+            </Principal>
+            <Dependent Role="Заказы">
+              <PropertyRef Name="Код_клиента" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_История_посещений_Пользователи">
+          <End Role="Пользователи" Type="Self.Пользователи" Multiplicity="1" />
+          <End Role="История_посещений" Type="Self.История_посещений" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Пользователи">
+              <PropertyRef Name="Код_сотрудника" />
+            </Principal>
+            <Dependent Role="История_посещений">
+              <PropertyRef Name="Код_сотрудника" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Услуги_в_заказе">
+          <End Role="Заказы" Type="Self.Заказы" Multiplicity="*" />
+          <End Role="Услуги" Type="Self.Услуги" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="ProkatEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Заказы" EntityType="Self.Заказы" />
+          <EntitySet Name="История_посещений" EntityType="Self.История_посещений" />
+          <EntitySet Name="Клиенты" EntityType="Self.Клиенты" />
+          <EntitySet Name="Пользователи" EntityType="Self.Пользователи" />
+          <EntitySet Name="Услуги" EntityType="Self.Услуги" />
+          <AssociationSet Name="FK_Заказы_Клиенты" Association="Self.FK_Заказы_Клиенты">
+            <End Role="Клиенты" EntitySet="Клиенты" />
+            <End Role="Заказы" EntitySet="Заказы" />
+          </AssociationSet>
+          <AssociationSet Name="FK_История_посещений_Пользователи" Association="Self.FK_История_посещений_Пользователи">
+            <End Role="Пользователи" EntitySet="Пользователи" />
+            <End Role="История_посещений" EntitySet="История_посещений" />
+          </AssociationSet>
+          <AssociationSet Name="Услуги_в_заказе" Association="Self.Услуги_в_заказе">
+            <End Role="Заказы" EntitySet="Заказы" />
+            <End Role="Услуги" EntitySet="Услуги" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище ProkatModelContainer" CdmEntityContainer="ProkatEntities">
+          <EntitySetMapping Name="Заказы">
+            <EntityTypeMapping TypeName="ProkatModel.Заказы">
+              <MappingFragment StoreEntitySet="Заказы">
+                <ScalarProperty Name="Код" ColumnName="Код" />
+                <ScalarProperty Name="Код_заказа" ColumnName="Код_заказа" />
+                <ScalarProperty Name="Дата_создания" ColumnName="Дата_создания" />
+                <ScalarProperty Name="Время_заказа" ColumnName="Время_заказа" />
+                <ScalarProperty Name="Код_клиента" ColumnName="Код_клиента" />
+                <ScalarProperty Name="Статус" ColumnName="Статус" />
+                <ScalarProperty Name="Дата_закрытия" ColumnName="Дата_закрытия" />
+                <ScalarProperty Name="Время_проката_ч" ColumnName="Время_проката_ч" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="История_посещений">
+            <EntityTypeMapping TypeName="ProkatModel.История_посещений">
+              <MappingFragment StoreEntitySet="История посещений">
+                <ScalarProperty Name="Код_авторизации" ColumnName="Код_авторизации" />
+                <ScalarProperty Name="Код_сотрудника" ColumnName="Код_сотрудника" />
+                <ScalarProperty Name="Последний_вход" ColumnName="Последний_вход" />
+                <ScalarProperty Name="Тип_входа" ColumnName="Тип_входа" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Клиенты">
+            <EntityTypeMapping TypeName="ProkatModel.Клиенты">
+              <MappingFragment StoreEntitySet="Клиенты">
+                <ScalarProperty Name="Код_клиента" ColumnName="Код_клиента" />
+                <ScalarProperty Name="Фамилия" ColumnName="Фамилия" />
+                <ScalarProperty Name="Имя" ColumnName="Имя" />
+                <ScalarProperty Name="Отчество" ColumnName="Отчество" />
+                <ScalarProperty Name="Серия_паспорта" ColumnName="Серия_паспорта" />
+                <ScalarProperty Name="Номер_паспорта" ColumnName="Номер_паспорта" />
+                <ScalarProperty Name="Дата_рождения" ColumnName="Дата_рождения" />
+                <ScalarProperty Name="Адрес" ColumnName="Адрес" />
+                <ScalarProperty Name="Почта" ColumnName="Почта" />
+                <ScalarProperty Name="Пароль" ColumnName="Пароль" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Пользователи">
+            <EntityTypeMapping TypeName="ProkatModel.Пользователи">
+              <MappingFragment StoreEntitySet="Пользователи">
+                <ScalarProperty Name="Код_сотрудника" ColumnName="Код_сотрудника" />
+                <ScalarProperty Name="Должность" ColumnName="Должность" />
+                <ScalarProperty Name="Фамилия" ColumnName="Фамилия" />
+                <ScalarProperty Name="Имя" ColumnName="Имя" />
+                <ScalarProperty Name="Отчество" ColumnName="Отчество" />
+                <ScalarProperty Name="Логин" ColumnName="Логин" />
+                <ScalarProperty Name="Пароль" ColumnName="Пароль" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Услуги">
+            <EntityTypeMapping TypeName="ProkatModel.Услуги">
+              <MappingFragment StoreEntitySet="Услуги">
+                <ScalarProperty Name="Код" ColumnName="Код" />
+                <ScalarProperty Name="Наименование_услуги" ColumnName="Наименование_услуги" />
+                <ScalarProperty Name="Код_услуги" ColumnName="Код_услуги" />
+                <ScalarProperty Name="Стоимость_руб_за_час" ColumnName="Стоимость_руб_за_час" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="Услуги_в_заказе" TypeName="ProkatModel.Услуги_в_заказе" StoreEntitySet="Услуги в заказе">
+            <EndProperty Name="Заказы">
+              <ScalarProperty Name="Код" ColumnName="Код_заказа" />
+            </EndProperty>
+            <EndProperty Name="Услуги">
+              <ScalarProperty Name="Код" ColumnName="Код_услуги" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
